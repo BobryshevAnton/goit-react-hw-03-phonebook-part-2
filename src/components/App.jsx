@@ -2,19 +2,44 @@ import React, { Component } from 'react';
 import { ContactForm } from './ContactForm/ContactForm';
 import { ContactList } from './ContactList/ContactList';
 import { Filter } from './Filter/Filter';
+//
+import Modal from './Modal/Modal';
+//
+
 import css from './app.module.css';
 import { nanoid } from 'nanoid';
 
 class App extends Component {
   state = {
     contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+      // { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+      // { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+      // { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+      // { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
     filter: '',
+    showModal: false,
   };
+  //
+  toggleModal = () => {
+    this.setState(state => ({
+      showModal: !state.showModal,
+    }));
+  };
+
+  //
+  componentDidMount() {
+    const contactsParsed = JSON.parse(localStorage.getItem('phoneBook'));
+    if (contactsParsed) {
+      this.setState({ contacts: contactsParsed });
+    }
+  }
+  componentDidUpdate(prevState) {
+    if (this.state.contacts !== prevState.contacts) {
+      localStorage.setItem('phoneBook', JSON.stringify(this.state.contacts));
+    }
+  }
+  //
 
   onContactForm = ({ name, number }) => {
     const newContact = {
@@ -46,7 +71,7 @@ class App extends Component {
     }));
   };
   render() {
-    const { contacts, filter } = this.state;
+    const { contacts, filter, showModal } = this.state;
     const elemNormal = filter.toLowerCase();
     const visibleList = contacts.filter(elem =>
       elem.name.toLowerCase().includes(elemNormal)
@@ -54,7 +79,23 @@ class App extends Component {
 
     return (
       <div className={css.form}>
-        <ContactForm onSubmit={this.onContactForm} contactList={contacts} />
+        <button
+          type="button"
+          className={css.form__button}
+          onClick={this.toggleModal}
+        >
+          Form for new contact
+        </button>
+        {showModal && (
+          <Modal toggleModal={this.toggleModal}>
+            <ContactForm
+              onSubmit={this.onContactForm}
+              contactList={contacts}
+              onClose={this.toggleModal}
+            />
+          </Modal>
+        )}
+        {/* <ContactForm onSubmit={this.onContactForm} contactList={contacts} /> */}
         <h1 className={css.form__title}>Contacts:</h1>
         <h1 className={css.form__title}>Find contacts by name</h1>
         <Filter onChange={this.onFilterSearch} value={filter} />
