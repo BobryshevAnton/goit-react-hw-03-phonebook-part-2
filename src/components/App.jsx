@@ -90,7 +90,6 @@ class App extends Component {
           <Modal toggleModal={this.toggleModal}>
             <ContactForm
               onSubmit={this.onContactForm}
-              contactList={contacts}
               onClose={this.toggleModal}
             />
           </Modal>
